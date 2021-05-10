@@ -6,6 +6,7 @@
 
 [功能完全的多对多音视频聊天室实现](https://github.com/peer-calls/peer-calls)
 
+[简单的聊天室实现<GO+Vue>](https://github.com/vouv/chat-room)
 
 ## 目录结构
 ```
