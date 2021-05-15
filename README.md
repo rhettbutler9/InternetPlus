@@ -13,6 +13,8 @@
 - server 服务端
 	- main 主要逻辑(java)
 	- rtc 实时通信(golang)
+	    -test  
+	  
 	- gateway 网关
 	- sql database schema
 	- conf 配置文件

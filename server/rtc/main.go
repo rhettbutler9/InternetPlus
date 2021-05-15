@@ -17,5 +17,5 @@ func main() {
 		wsCtrl := controller.WSCtrl{}
 		ws.GET("/msg", wsCtrl.Get)
 	}
-	server.Run(":51700")
+	server.Run(":51707")
 }

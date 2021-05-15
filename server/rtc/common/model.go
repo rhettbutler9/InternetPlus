@@ -14,7 +14,6 @@ type WebSocketResp struct {
 type WsMsg struct {
 	//StatusCode uint16 `json:"status_code"`
 	Data       []byte `json:"data"`
-	Message string `json:"message"`
 	SenderId int `json:"sender_id"`
 	IsText bool `json:"is_text"`
 }
