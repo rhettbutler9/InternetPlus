@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xxxx.localism.mapper.DynamicMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xxxx.localism.pojo.Dynamic">
+        <id column="id" property="id" />
+        <result column="admin_id" property="adminId" />
+        <result column="content" property="content" />
+        <result column="image" property="image" />
+        <result column="play" property="play" />
+        <result column="create_time" property="createTime" />
+        <result column="stars" property="stars" />
+        <result column="collects" property="collects" />
+        <result column="deleted" property="deleted" />
+        <result column="tags" property="tags"/>
+    </resultMap>
+    <resultMap id="allDynamicInfo" type="com.xxxx.localism.pojo.Dynamic" extends="BaseResultMap">
+        <association property="admin" javaType="com.xxxx.localism.pojo.Admin">
+            <result column="aname" property="name"/>
+        </association>
+    </resultMap>
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, admin_id, content, image, play, create_time, stars, collects, deleted
+    </sql>
+    <select id="getAllDynamicInfo" resultMap="allDynamicInfo">
+        SELECT
+            d.*,
+            a.NAME AS aname
+        FROM
+            t_dynamic d,
+            t_admin a
+        WHERE
+            a.id = d.admin_id
+        ORDER BY
+            d.stars
+            LIMIT #{currentPage},#{size}
+
+    </select>
+
+</mapper>

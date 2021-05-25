@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xxxx.localism.mapper.AdminMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xxxx.localism.pojo.Admin">
+        <id column="id" property="id" />
+        <result column="name" property="name"/>
+        <result column="enabled" property="enabled" />
+        <result column="username" property="username" />
+        <result column="password" property="password" />
+        <result column="userFace" property="userFace" />
+        <result column="isExpert" property="isExpert" />
+        <result column="canCreateParty" property="canCreateParty"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name,  enabled, username, password, userFace
+    </sql>
+    <insert id="addStar">
+        INSERT INTO ${table1} ( aid, ${id} ) VALUES(#{adminId},#{Id});
+        UPDATE  ${table2} SET stars=stars+1 WHERE id=#{Id};
+    </insert>
+    <insert id="addCollect">
+        INSERT INTO ${table1} (aid,${id}) VALUES (#{adminId},#{videoId});
+        UPDATE  ${table2} SET collects=collects+1 WHERE id=#{videoId};
+    </insert>
+    <delete id="deleteStar">
+        DELETE FROM
+            ${table1}
+        WHERE
+            aid=#{adminId}
+          AND
+            ${id}=#{videoId};
+        UPDATE  ${table2} SET stars=stars-1 WHERE id=#{videoId};
+    </delete>
+    <delete id="deleteCollect">
+        DELETE FROM
+            ${table1}
+        WHERE
+            aid=#{adminId}
+          AND
+            ${id}=#{videoId};
+        UPDATE  ${table2} SET collects=collects-1 WHERE id=#{videoId};
+    </delete>
+
+    <select id="getAdminByUserName" resultType="com.xxxx.localism.pojo.Admin">
+        SELECT
+            a.*
+        FROM
+            t_admin a
+        WHERE
+            a.username=#{username}
+    </select>
+
+
+</mapper>

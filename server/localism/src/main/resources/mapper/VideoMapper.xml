@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xxxx.localism.mapper.VideoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xxxx.localism.pojo.Video">
+        <id column="id" property="id" />
+        <result column="admin_id" property="adminId" />
+        <result column="name" property="name" />
+        <result column="image" property="image" />
+        <result column="stars" property="stars" />
+        <result column="collects" property="collects" />
+        <result column="play" property="play" />
+        <result column="create_time" property="createTime"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+
+    
+    <resultMap id="CurrentVideoInfo" type="com.xxxx.localism.pojo.Video" extends="BaseResultMap">
+        <result column="stars" property="stars"/>
+        <result column="collects" property="collects"/>
+        <collection property="comments" resultMap="commentsChildren" javaType="java.util.ArrayList"></collection>
+    </resultMap>
+
+    <resultMap id="commentsChildren" type="com.xxxx.localism.pojo.Comment">
+        <result column="cid" property="id"/>
+        <result column="ccontent" property="content"/>
+        <result column="create_time" property="createTime"/>
+        <collection property="children" ofType="com.xxxx.localism.pojo.Reply">
+            <result column="rid" property="id"/>
+            <result column="rcontent" property="content"/>
+            <result column="rcreate_time" property="createTime"/>
+        </collection>
+    </resultMap>
+
+
+    <resultMap id="AllVideoInfo" type="com.xxxx.localism.pojo.Video" extends="BaseResultMap">
+        <association property="admin" javaType="com.xxxx.localism.pojo.Admin">
+            <result column="aname" property="name"/>
+        </association>
+    </resultMap>
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, admin_id, name, image, star, collet, play
+    </sql>
+    
+    
+
+
+    <select id="getCurrentVideoInfo" resultMap="CurrentVideoInfo">
+        SELECT DISTINCT
+            v.*,
+            c.id AS cid,
+            c.content AS ccontent,
+            c.create_time AS create_time,
+            r.id AS rid,
+            r.content AS rcontent,
+            r.create_time AS rcreate_time
+        FROM
+            t_comment c,
+            t_video v,
+            comment_video cv,
+            t_reply r,
+            comment_reply cr
+        WHERE
+          cv.cid = c.id
+          AND cv.vid = v.id
+          AND cr.rid = r.id
+          AND cr.cid = c.id
+          AND v.id = #{id}
+        ORDER BY
+            c.create_time,
+            r.create_time
+    </select>
+
+
+
+    <select id="getStar" resultType="java.lang.Boolean">
+        SELECT
+            COUNT(#{id})
+        FROM
+            star s
+        WHERE
+            vid = #{id}
+          AND
+            aid = #{adminId}
+    </select>
+
+    <select id="getCollect" resultType="java.lang.Boolean">
+        SELECT
+            COUNT(#{id})
+        FROM
+            collect
+        WHERE
+            vid = #{id}
+          AND
+            aid = #{adminId}
+    </select>
+
+
+    <select id="getAllPassageByMenuId" resultMap="AllVideoInfo">
+        SELECT
+            v.*,
+--             v.stars AS vstars,
+--             v.collects AS vcollects,
+--             v.id AS vid,
+--             v.content AS vcontent,
+--             v.image AS vimage,
+--             v.play AS vplay,
+--             v.create_time AS vcreate_time,
+            a.name AS aname
+        FROM
+            menu_video mv,
+            t_video v,
+            t_admin a
+        WHERE
+            mv.mid = #{id}
+          AND mv.vid = v.id
+          AND v.admin_id = a.id
+        ORDER BY
+            ${how} DESC
+            LIMIT #{currentPage},#{size}
+    </select>
+
+
+</mapper>

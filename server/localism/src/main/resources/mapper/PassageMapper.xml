@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xxxx.localism.mapper.PassageMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xxxx.localism.pojo.Passage">
+        <id column="id" property="id" />
+        <result column="admin_id" property="adminId" />
+        <result column="content" property="content" />
+        <result column="image" property="image" />
+        <result column="play" property="play" />
+        <result column="create_time" property="createTime" />
+        <result column="deleted" property="deleted"/>
+        <result column="name" property="name"/>
+        <result column="stars" property="stars"/>
+        <result column="collects" property="collects"/>
+    </resultMap>
+
+    <resultMap id="AllPassageInfo" type="com.xxxx.localism.pojo.Passage" extends="BaseResultMap">
+        <id column="pid" property="id"/>
+        <result column="pname" property="name"/>
+        <result column="pcollects" property="collects"/>
+        <result column="pstars" property="stars"/>
+        <result column="pcontent" property="content"/>
+        <result column="pimage" property="image"/>
+        <result column="pplay" property="play"/>
+        <result column="pcreate_time" property="createTime"/>
+        <association property="admin" javaType="com.xxxx.localism.pojo.Admin">
+            <result column="aname" property="name"/>
+        </association>
+    </resultMap>
+
+    <resultMap id="PassageInfo" type="com.xxxx.localism.pojo.Passage" extends="BaseResultMap">
+        <result property="stars" column="pstars"/>
+        <result property="collects" column="pcollects"/>
+        <collection property="comments" resultMap="commentsChildren" javaType="java.util.ArrayList"></collection>
+    </resultMap>
+
+    <resultMap id="commentsChildren" type="com.xxxx.localism.pojo.Comment">
+        <result column="cid" property="id"/>
+        <result column="ccontent" property="content"/>
+        <result column="create_time" property="createTime"/>
+        <collection property="children" ofType="com.xxxx.localism.pojo.Reply">
+            <result column="rid" property="id"/>
+            <result column="rcontent" property="content"/>
+            <result column="rcreate_time" property="createTime"/>
+        </collection>
+    </resultMap>
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, admin_id, content, image, play, create_time
+    </sql>
+    <insert id="uploadFile">
+        INSERT INTO ${t1}(admin_id,content,create_time,image,name) VALUES (#{adminId},#{url},#{time},#{imageUrl},#{name});
+        INSERT INTO ${t2}(mid,pid) VALUES(#{menuId},LAST_INSERT_ID());
+    </insert>
+
+    <select id="getAllPassageByMenuId" resultMap="AllPassageInfo">
+        SELECT
+            p.name AS pname,
+            p.deleted AS pdeleted,
+            p.stars AS pstars,
+            p.collects AS pcollects,
+            p.id AS pid,
+            p.content AS pcontent,
+            p.image AS pimage,
+            p.play AS pplay,
+            p.create_time AS pcreate_time,
+            a.name AS aname
+        FROM
+            menu_passage mp,
+            t_passage p,
+            t_admin a
+        WHERE
+            mp.mid =#{id}
+          AND
+            mp.pid=p.id
+          AND
+            p.admin_id=a.id
+            ORDER BY
+            ${how} DESC
+            LIMIT #{currentPage},#{size}
+    </select>
+
+    <select id="getSinglePassageInfo" resultMap="PassageInfo">
+        SELECT DISTINCT
+            p.*,
+            c.id AS cid,
+            c.content AS ccontent,
+            c.create_time AS create_time,
+            r.id AS rid,
+            r.content AS rcontent,
+            r.create_time AS rcreate_time
+        FROM
+            p_comment c,
+            t_passage p,
+            p_comment_passage cp,
+            p_reply r,
+            p_comment_reply cr
+        WHERE
+            cp.cid = c.id
+          AND cp.pid = p.id
+          AND cr.rid = r.id
+          AND cr.cid = c.id
+          AND p.id = #{id}
+        ORDER BY
+            c.create_time,
+            r.create_time
+    </select>
+    <select id="getStar" resultType="java.lang.Boolean">
+        SELECT
+            COUNT(#{id})
+        FROM
+            p_star s
+        WHERE
+            pid = #{id}
+          AND
+            aid = #{adminId}
+    </select>
+
+    <select id="getCollect" resultType="java.lang.Boolean">
+        SELECT
+            COUNT(#{id})
+        FROM
+            p_collect
+        WHERE
+            pid = #{id}
+          AND
+            aid = #{adminId}
+    </select>
+</mapper>

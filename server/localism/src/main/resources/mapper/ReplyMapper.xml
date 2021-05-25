@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xxxx.localism.mapper.ReplyMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xxxx.localism.pojo.Reply">
+        <id column="id" property="id" />
+        <result column="create_time" property="createTime" />
+        <result column="modified_time" property="modifiedTime" />
+        <result column="deleted" property="deleted" />
+        <result column="context" property="content" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, create_time, modified_time, deleted, context
+    </sql>
+
+    <insert id="addComment">
+        INSERT INTO ${table3} ( content, admin_id,create_time) VALUES( #{content}, #{adminId},#{createTime});
+        INSERT INTO ${table4} ( rid, cid ) SELECT  LAST_INSERT_ID(),MAX(id)  FROM  ${table1};
+    </insert>
+    <delete id="deleteList">
+        delete from p_reply_copy1 where id in (
+        <foreach collection="list" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+    </delete>
+    <delete id="deleteReply">
+        delete from ${table3} where id in (
+        <foreach collection="list" item="id" separator=",">
+            #{id}
+        </foreach>
+        );
+        DELETE
+        FROM
+        ${table4}
+        WHERE
+        cid =#{commentId};
+    </delete>
+
+</mapper>
