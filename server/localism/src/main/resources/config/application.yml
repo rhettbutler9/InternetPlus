@@ -16,8 +16,8 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://120.76.57.148:3306/localism?useUnicode=true&characterEncoding=UTF8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
-    username: root
-    password: 123456
+    username: 
+    password: 
     hikari:
       # 连接池名
       pool-name: DateHikariCP
